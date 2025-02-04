@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong with Stick Figures</title>
+    <style>
+        canvas {
+            background: black;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1000" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let paddleHeight = 80, paddleWidth = 10;
+        let player1Y = (canvas.height - paddleHeight) / 2;
+        let player2Y = (canvas.height - paddleHeight) / 2;
+        let ballX = canvas.width / 2, ballY = canvas.height / 2;
+        let ballSpeedX = 4, ballSpeedY = 6;
+
+        function drawStickFigure(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y - 20, 10, 0, Math.PI * 2); // Head
+            ctx.moveTo(x, y - 10);
+            ctx.lineTo(x, y + 20); // Body
+            ctx.lineTo(x - 10, y + 40); // Left leg
+            ctx.moveTo(x, y + 20);
+            ctx.lineTo(x + 10, y + 40); // Right leg
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 10, y + 10); // Left arm
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + 10, y + 10); // Right arm
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.fillRect(70, player1Y, paddleWidth, paddleHeight);
+            ctx.fillRect(canvas.width - 90, player2Y, paddleWidth, paddleHeight);
+            drawStickFigure(30, player1Y + 40);
+            drawStickFigure(canvas.width - 30, player2Y + 40);
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function update() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            if (ballY <= 0 || ballY >= canvas.height) ballSpeedY *= -1;
+            if (
+                (ballX <= 20 && ballY >= player1Y && ballY <= player1Y + paddleHeight) ||
+                (ballX >= canvas.width - 20 && ballY >= player2Y && ballY <= player2Y + paddleHeight)
+            ) {
+                ballSpeedX *= -1;
+            }
+            draw();
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "w" && player1Y > 0) player1Y -= 10;
+            if (e.key === "s" && player1Y < canvas.height - paddleHeight) player1Y += 10;
+            if (e.key === "ArrowUp" && player2Y > 0) player2Y -= 10;
+            if (e.key === "ArrowDown" && player2Y < canvas.height - paddleHeight) player2Y += 10;
+        });
+
+        setInterval(update, 1000 / 60);
+    </script>
+</body>
+</html>
